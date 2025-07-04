@@ -6,7 +6,34 @@
     class?: string
   }
 
-  let { class: className }: Props = $props()
+  const { class: className }: Props = $props()
+
+  const handleSquareClick = (clickedCell: ChessCell) => {
+    const selectedCell = board.flat().find((c) => c.selected)
+    if (selectedCell) {
+      if (!selectedCell.piece) {
+        console.error('Selected cell has no piece')
+        return
+      }
+      if (clickedCell.selected) {
+        // If the clicked cell is already selected, deselect it
+        clickedCell.selected = false
+      } else if (clickedCell.dotted) {
+        // If the clicked cell is dotted, the move is valid
+        clickedCell.piece = selectedCell.piece
+        selectedCell.piece = null
+        selectedCell.selected = false
+      } else if (clickedCell.piece) {
+        // Change the selection
+        selectedCell.selected = false
+        clickedCell.selected = true
+      }
+    } else {
+      if (clickedCell.piece) {
+        clickedCell.selected = true
+      }
+    }
+  }
 
   let boardBase: ChessCell[][] = Array.from({ length: 8 }, (_, iy) =>
     Array.from({ length: 8 }, (_, ix) => {
@@ -44,24 +71,15 @@
 </script>
 
 <div class={className}>
-  {#each board as row}
+  {#each [...board].reverse() as row}
     <div class="flex flex-row">
-      {#each row as cell}
+      {#each row as clickedCell}
         <ChessSquare
-          color={cell.color}
-          piece={cell.piece}
-          selected={cell.selected}
-          dotted={cell.dotted}
-          onclick={() => {
-            if (cell.piece) {
-              if (cell.selected) {
-                cell.selected = false // Deselect if already selected
-              } else {
-                board.forEach((r) => r.forEach((c) => (c.selected = false))) // Deselect all cells
-                cell.selected = true
-              }
-            }
-          }}
+          color={clickedCell.color}
+          piece={clickedCell.piece}
+          selected={clickedCell.selected}
+          dotted={clickedCell.dotted}
+          onclick={() => handleSquareClick(clickedCell)}
         />
       {/each}
     </div>
