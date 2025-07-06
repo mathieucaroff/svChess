@@ -36,16 +36,18 @@ export function computeDotting(board: ChessCell[][]): ChessCell[] {
         bishop: (): Pair[] => {
           const proposal: [number, number][] = []
           Array.from({ length: 7 }, (_, i) => {
-            proposal.push([sc.ix + i, sc.iy + i])
-            proposal.push([sc.ix - i, sc.iy + i])
-            proposal.push([sc.ix - i, sc.iy - i])
-            proposal.push([sc.ix + i, sc.iy - i])
+            proposal.push(
+              [sc.ix + i, sc.iy + i],
+              [sc.ix - i, sc.iy + i],
+              [sc.ix - i, sc.iy - i],
+              [sc.ix + i, sc.iy - i],
+            )
           })
           return proposal
         },
         rook: (): Pair[] => {
           const proposal: [number, number][] = []
-          Array.from({ length: 7 }, (_, i) => {
+          Array.from({ length: 8 }, (_, i) => {
             if (i !== sc.ix) {
               proposal.push([i, sc.iy])
             }

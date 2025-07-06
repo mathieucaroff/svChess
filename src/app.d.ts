@@ -32,6 +32,19 @@ declare global {
   }
 
   type Pair = [number, number]
+
+  interface DragInfo {
+    active: boolean
+    // The position of the mouse when dragging started
+    startX: number
+    startY: number
+    // The current position of the mouse, relative to its starting position
+    dx: number
+    dy: number
+    // The position of the piece being dragged
+    ix: number
+    iy: number
+  }
 }
 
 export {}

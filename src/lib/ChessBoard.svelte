@@ -1,4 +1,6 @@
 <script lang="ts">
+  import ChessBoardLetterBar from './ChessBoardLetterBar.svelte'
+  import ChessBoardNumberCell from './ChessBoardNumberCell.svelte'
   import ChessSquare from './ChessSquare.svelte'
   import { computeDotting } from './dotting.js'
 
@@ -8,7 +10,7 @@
 
   const { class: className }: Props = $props()
 
-  const handleSquareClick = (clickedCell: ChessCell) => {
+  const handleSquareMouseDown = (clickedCell: ChessCell, ev: MouseEvent) => {
     const selectedCell = board.flat().find((c) => c.selected)
     if (selectedCell) {
       if (!selectedCell.piece) {
@@ -33,6 +35,29 @@
         clickedCell.selected = true
       }
     }
+
+    if (clickedCell.selected) {
+      drag.active = true
+      drag.startX = ev.clientX
+      drag.startY = ev.clientY
+      drag.ix = clickedCell.ix
+      drag.iy = clickedCell.iy
+    }
+  }
+
+  const handleMouseMove = (ev: MouseEvent) => {
+    if (drag.active) {
+      drag.dx = ev.clientX - drag.startX
+      drag.dy = ev.clientY - drag.startY
+    }
+  }
+
+  const handleSquareMouseUp = (ev: MouseEvent) => {
+    drag.active = false
+  }
+
+  function isBeingDragged(cell: ChessCell): boolean {
+    return drag.active && cell.ix === drag.ix && cell.iy === drag.iy
   }
 
   let boardBase: ChessCell[][] = Array.from({ length: 8 }, (_, iy) =>
@@ -60,6 +85,7 @@
   )
 
   let board = $state(boardBase)
+  let drag: DragInfo = $state({ active: false, startX: 0, startY: 0, dx: 0, dy: 0, ix: 0, iy: 0 })
   let dottingCellArray = $derived(computeDotting(board))
 
   $effect(() => {
@@ -68,20 +94,41 @@
     // Set dotted state based on dottingCellArray
     dottingCellArray.forEach((cell) => (cell.dotted = true))
   })
+
+  $effect(() => {
+    // Set up mouse event listeners
+    window.addEventListener('mousemove', handleMouseMove, true)
+    window.addEventListener('mouseup', handleSquareMouseUp, true)
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove, true)
+      window.removeEventListener('mouseup', handleSquareMouseUp, true)
+    }
+  })
 </script>
 
 <div class={className}>
-  {#each [...board].reverse() as row}
+  <ChessBoardLetterBar />
+  {#each [...board].reverse() as row, iy}
     <div class="flex flex-row">
-      {#each row as clickedCell}
+      <ChessBoardNumberCell {iy} />
+      {#each row as cell}
         <ChessSquare
-          color={clickedCell.color}
-          piece={clickedCell.piece}
-          selected={clickedCell.selected}
-          dotted={clickedCell.dotted}
-          onclick={() => handleSquareClick(clickedCell)}
+          color={cell.color}
+          piece={isBeingDragged(cell) ? null : cell.piece}
+          selected={cell.selected}
+          dotted={cell.dotted}
+          onmousedown={(ev: MouseEvent) => handleSquareMouseDown(cell, ev)}
         />
       {/each}
+      <ChessBoardNumberCell {iy} />
     </div>
   {/each}
+  <ChessBoardLetterBar />
+  {#if drag.active}
+    <div class="pointer-events-none relative">
+      <div class="absolute" style:left={-drag.dx} style:top={-drag.dy}>
+        <ChessSquare piece={board[drag.iy][drag.ix].piece} />
+      </div>
+    </div>
+  {/if}
 </div>
