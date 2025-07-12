@@ -6,13 +6,15 @@
     piece: Piece | null
     selected?: boolean
     dotted?: boolean
+    ix?: number
+    iy?: number
     onmousedown?: (ev: MouseEvent) => void
   }
 
-  let { color, piece, selected, dotted, onmousedown }: Props = $props()
+  let { color, piece, selected, dotted, ix, iy, onmousedown }: Props = $props()
 </script>
 
-<div {onmousedown} role="presentation" class="relative size-[100px]">
+<div {onmousedown} role="presentation" class="relative size-[100px]" data-ix={ix} data-iy={iy}>
   <div
     class={[
       'absolute inset-0 size-full',

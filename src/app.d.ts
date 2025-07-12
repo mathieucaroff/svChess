@@ -31,14 +31,19 @@ declare global {
     dotted?: boolean
   }
 
-  type Pair = [number, number]
+  interface ChessMove {
+    from: ChessCell
+    to: ChessCell
+  }
+
+  interface ChessDestination {
+    to: ChessCell
+    enPassant?: boolean
+  }
 
   interface DragInfo {
     active: boolean
-    // The position of the mouse when dragging started
-    startX: number
-    startY: number
-    // The current position of the mouse, relative to its starting position
+    // The current position of the mouse during drag
     dx: number
     dy: number
     // The position of the piece being dragged
