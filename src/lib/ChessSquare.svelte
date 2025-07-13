@@ -22,7 +22,7 @@
     ]}
   ></div>
   <div class={['absolute inset-0 size-full', { 'border-15 border-red-400': selected }]}></div>
-  <div class={['absolute inset-0 flex size-full  items-center justify-center']}>
+  <div class={['absolute inset-0 flex size-full items-center justify-center text-black']}>
     {#if piece}
       {#if piece.type === 'pawn'}
         <Icon

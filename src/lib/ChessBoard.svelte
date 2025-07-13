@@ -109,10 +109,10 @@
 
 <div class={className}>
   <ChessBoardLetterBar />
-  {#each [...board].reverse() as row, iy}
+  {#each [...board].reverse() as row, iy (iy)}
     <div class="flex flex-row">
       <ChessBoardNumberCell {iy} />
-      {#each row as cell}
+      {#each row as cell, ix (ix)}
         <ChessSquare
           color={cell.color}
           piece={isBeingDragged(cell) ? null : cell.piece}

@@ -1,7 +1,7 @@
 export function getBoardFromHistory(history: ChessMove[]): ChessCell[][] {
-  let board: ChessCell[][] = Array.from({ length: 8 }, (_, iy) =>
+  const board: ChessCell[][] = Array.from({ length: 8 }, (_, iy) =>
     Array.from({ length: 8 }, (_, ix) => {
-      const squareColor: WhiteOrBlack = (ix + iy) % 2 === 0 ? 'white' : 'black'
+      const squareColor: WhiteOrBlack = (ix + iy) % 2 === 0 ? 'black' : 'white'
       const color: WhiteOrBlack = iy < 4 ? 'white' : 'black'
       const type: PieceType | null =
         iy === 1 || iy === 6
