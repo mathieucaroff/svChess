@@ -3,9 +3,9 @@
   import ChessBoard from '$lib/ChessBoard.svelte'
   import MoveHistory from '$lib/MoveHistory.svelte'
 
-  let moveHistory = $state<ChessMove[]>([])
+  let moveHistory = $state<ChessHalfMove[]>([])
 
-  function handleMove(move: ChessMove) {
+  function handleMove(move: ChessHalfMove) {
     moveHistory = [...moveHistory, move]
   }
 
@@ -21,14 +21,16 @@
 </script>
 
 <div class="flex h-screen">
-  <div class="flex flex-1 items-center justify-center bg-gray-100">
+  <div class="flex flex-1 items-center justify-center">
     <ChessBoard {moveHistory} onMove={handleMove} />
   </div>
-  <div class="flex flex-col">
-    <div class="border-b border-gray-200 bg-gray-50 p-4">
+  <div
+    class="flex flex-col border-l border-gray-200 bg-gray-50 pt-18 dark:border-gray-700 dark:bg-gray-900"
+  >
+    <div class="border-b p-4">
       <button
         onclick={resetGame}
-        class="w-full rounded bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600"
+        class="w-full rounded bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
       >
         Reset Game
       </button>

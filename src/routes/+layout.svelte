@@ -29,7 +29,7 @@
 </script>
 
 <div
-  class="min-h-screen bg-white text-gray-900 transition-colors duration-200 dark:bg-black dark:text-white"
+  class="min-h-screen bg-gray-100 bg-white text-gray-900 transition-colors duration-200 dark:bg-gray-800 dark:text-white"
 >
   <!-- Theme toggle button -->
   <div class="fixed top-4 right-4 z-50">

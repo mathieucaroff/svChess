@@ -1,4 +1,4 @@
-export function getBoardFromHistory(history: ChessMove[]): ChessCell[][] {
+export function getBoardFromHistory(history: ChessHalfMove[]): ChessCell[][] {
   const board: ChessCell[][] = Array.from({ length: 8 }, (_, iy) =>
     Array.from({ length: 8 }, (_, ix) => {
       const squareColor: WhiteOrBlack = (ix + iy) % 2 === 0 ? 'black' : 'white'

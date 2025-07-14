@@ -2,18 +2,18 @@
   import { formatMove } from './notation.js'
 
   interface Props {
-    moveHistory: ChessMove[]
+    moveHistory: ChessHalfMove[]
     onMoveClick?: (moveIndex: number) => void
   }
 
   const { moveHistory, onMoveClick }: Props = $props()
 
   // Group moves into pairs (white, black)
-  function getMovePairs(moves: ChessMove[]) {
+  function getMovePairs(moves: ChessHalfMove[]) {
     const pairs: Array<{
       moveNumber: number
-      white?: ChessMove
-      black?: ChessMove
+      white?: ChessHalfMove
+      black?: ChessHalfMove
       whiteIndex?: number
       blackIndex?: number
     }> = []
@@ -40,21 +40,25 @@
   }
 </script>
 
-<div class="h-full w-80 overflow-y-auto border-l border-gray-200 bg-gray-50 p-4">
-  <h2 class="mb-4 text-lg font-bold text-gray-800">Move History</h2>
+<div class="h-full w-80 overflow-y-auto p-3">
+  <h2 class="mb-3 text-base font-bold text-gray-800 dark:text-gray-200">Move History</h2>
 
   {#if moveHistory.length === 0}
-    <p class="text-gray-500 italic">No moves yet</p>
+    <p class="text-sm text-gray-500 italic dark:text-gray-400">No moves yet</p>
   {:else}
-    <div class="space-y-1">
+    <div class="space-y-0.5">
       {#each getMovePairs(moveHistory) as pair}
-        <div class="flex items-center space-x-2 rounded p-2 hover:bg-gray-100">
+        <div
+          class="flex items-center space-x-1 rounded px-1 py-0.5 hover:bg-gray-100 dark:hover:bg-gray-800"
+        >
           <!-- Move number -->
-          <span class="w-8 text-xs font-bold text-gray-600">{pair.moveNumber}.</span>
+          <span class="w-6 text-xs font-semibold text-gray-600 dark:text-gray-400"
+            >{pair.moveNumber}.</span
+          >
 
           <!-- White move -->
           <button
-            class="flex-1 rounded px-2 py-1 text-left font-mono text-sm transition-colors hover:bg-blue-100"
+            class="flex-1 rounded px-1 py-0.5 text-left font-mono text-xs transition-colors hover:bg-blue-100 dark:text-gray-200 dark:hover:bg-blue-900"
             onclick={() => pair.whiteIndex !== undefined && handleMoveClick(pair.whiteIndex)}
           >
             {pair.white ? formatMove(pair.white) : ''}
@@ -62,7 +66,7 @@
 
           <!-- Black move -->
           <button
-            class="flex-1 rounded px-2 py-1 text-left font-mono text-sm transition-colors hover:bg-blue-100 {pair.black
+            class="flex-1 rounded px-1 py-0.5 text-left font-mono text-xs transition-colors hover:bg-blue-100 dark:text-gray-200 dark:hover:bg-blue-900 {pair.black
               ? ''
               : 'opacity-50'}"
             onclick={() => pair.blackIndex !== undefined && handleMoveClick(pair.blackIndex)}
@@ -75,12 +79,12 @@
     </div>
   {/if}
 
-  <div class="mt-6 border-t border-gray-200 pt-4">
-    <p class="text-xs text-gray-500">
+  <div class="mt-4 border-t border-gray-200 pt-3 dark:border-gray-700">
+    <p class="text-xs text-gray-500 dark:text-gray-400">
       Total moves: {moveHistory.length}
     </p>
     {#if moveHistory.length > 0}
-      <p class="text-xs text-gray-500">
+      <p class="text-xs text-gray-500 dark:text-gray-400">
         Current turn: {moveHistory.length % 2 === 0 ? 'White' : 'Black'}
       </p>
     {/if}

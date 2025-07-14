@@ -7,7 +7,7 @@ const typeToLetter: Record<string, string> = {
   king: 'K',
 }
 
-export function formatMove(move: ChessMove): string {
+export function formatMove(move: ChessHalfMove): string {
   const piece = move.from.piece
   if (!piece) return '???'
 

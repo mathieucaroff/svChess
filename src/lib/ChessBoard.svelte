@@ -7,8 +7,8 @@
 
   interface Props {
     class?: string
-    moveHistory?: ChessMove[]
-    onMove?: (move: ChessMove) => void
+    moveHistory?: ChessHalfMove[]
+    onMove?: (move: ChessHalfMove) => void
   }
 
   const { class: className, moveHistory = [], onMove }: Props = $props()
@@ -41,7 +41,7 @@
       }
       if (clickedCell.dotted) {
         // If the clicked cell is dotted, the move is valid - create a clean move object
-        const move: ChessMove = {
+        const move: ChessHalfMove = {
           from: {
             ...selectedPiece,
             selected: false,
@@ -81,7 +81,7 @@
 
           if (targetCell.dotted) {
             // Valid move - create a clean move object
-            const move: ChessMove = {
+            const move: ChessHalfMove = {
               from: {
                 id: draggedCell.id,
                 ix: draggedCell.ix,

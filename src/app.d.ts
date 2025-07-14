@@ -31,9 +31,14 @@ declare global {
     dotted?: boolean
   }
 
-  interface ChessMove {
+  interface ChessHalfMove {
     from: ChessCell
     to: ChessCell
+  }
+
+  interface ChessMove {
+    white: ChessHalfMove
+    black?: ChessHalfMove
   }
 
   interface ChessDestination {
