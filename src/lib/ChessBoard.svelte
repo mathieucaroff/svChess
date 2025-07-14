@@ -23,23 +23,27 @@
       drag.iy = clickedCell.iy
 
       // Select the piece for drag
-      board.forEach((row) => row.forEach((cell) => (cell.selected = false)))
-      clickedCell.selected = true
+      selectedCell = { ix: clickedCell.ix, iy: clickedCell.iy }
       return
     }
 
     // Handle regular click logic for empty squares
-    const selectedCell = board.flat().find((c) => c.selected)
     if (selectedCell) {
-      if (!selectedCell.piece) {
+      const selectedPiece = displayBoard[selectedCell.iy][selectedCell.ix]
+      if (!selectedPiece.piece) {
         console.error('Selected cell has no piece')
         return
       }
       if (clickedCell.dotted) {
-        // If the clicked cell is dotted, the move is valid
-        clickedCell.piece = selectedCell.piece
-        selectedCell.piece = null
-        selectedCell.selected = false
+        // If the clicked cell is dotted, the move is valid - add to move history
+        moveHistory = [
+          ...moveHistory,
+          {
+            from: { ...selectedPiece },
+            to: { ...clickedCell },
+          },
+        ]
+        selectedCell = null
       }
     }
   }
@@ -61,13 +65,18 @@
         if (squareElement) {
           const targetIx = Number(squareElement.getAttribute('data-ix'))
           const targetIy = Number(squareElement.getAttribute('data-iy'))
-          const targetCell = board[targetIy][targetIx]
-          const draggedCell = board[drag.iy][drag.ix]
+          const targetCell = displayBoard[targetIy][targetIx]
+          const draggedCell = displayBoard[drag.iy][drag.ix]
 
           if (targetCell.dotted) {
-            // Valid move - move the piece
-            targetCell.piece = draggedCell.piece
-            draggedCell.piece = null
+            // Valid move - add to move history
+            moveHistory = [
+              ...moveHistory,
+              {
+                from: { ...draggedCell },
+                to: { ...targetCell },
+              },
+            ]
           }
         }
       }
@@ -76,7 +85,7 @@
       drag.active = false
       drag.dx = 0
       drag.dy = 0
-      board.forEach((row) => row.forEach((cell) => (cell.selected = false)))
+      selectedCell = null
     }
   }
 
@@ -85,16 +94,36 @@
   }
 
   let moveHistory = $state<ChessMove[]>([])
-  let board = $derived(getBoardFromHistory(moveHistory))
+  let selectedCell = $state<{ ix: number; iy: number } | null>(null)
   let drag: DragInfo = $state({ active: false, dx: 0, dy: 0, ix: 0, iy: 0 })
+
+  // Get base board without any UI state
+  let baseBoard = $derived(getBoardFromHistory(moveHistory))
+
+  // Apply selection state to board
+  let board = $derived(
+    baseBoard.map((row, iy) =>
+      row.map((cell, ix) => ({
+        ...cell,
+        selected: selectedCell ? selectedCell.ix === ix && selectedCell.iy === iy : false,
+      })),
+    ),
+  )
+
+  // Compute valid moves based on current board state
   let dottingCellArray = $derived(computeMovement(board))
 
-  $effect(() => {
-    // Reset dotted state
-    board.forEach((row) => row.forEach((cell) => (cell.dotted = false)))
-    // Set dotted state based on dottingCellArray
-    dottingCellArray.forEach((cell) => (cell.dotted = true))
-  })
+  // Apply dotting state to board for display
+  let displayBoard = $derived(
+    board.map((row) =>
+      row.map((cell) => ({
+        ...cell,
+        dotted: dottingCellArray.some(
+          (dottedCell) => dottedCell.ix === cell.ix && dottedCell.iy === cell.iy,
+        ),
+      })),
+    ),
+  )
 
   $effect(() => {
     // Set up mouse event listeners
@@ -109,7 +138,7 @@
 
 <div class={className}>
   <ChessBoardLetterBar />
-  {#each [...board].reverse() as row, iy (iy)}
+  {#each [...displayBoard].reverse() as row, iy (iy)}
     <div class="flex flex-row">
       <ChessBoardNumberCell {iy} />
       {#each row as cell, ix (ix)}
@@ -133,7 +162,7 @@
       style:left="{drag.dx - 50}px"
       style:top="{drag.dy - 50}px"
     >
-      <ChessSquare piece={board[drag.iy][drag.ix].piece} />
+      <ChessSquare piece={displayBoard[drag.iy][drag.ix].piece} />
     </div>
   {/if}
 </div>
