@@ -7,15 +7,20 @@
 
   interface Props {
     class?: string
+    moveHistory?: ChessMove[]
+    onMove?: (move: ChessMove) => void
   }
 
-  const { class: className }: Props = $props()
+  const { class: className, moveHistory = [], onMove }: Props = $props()
 
   const handleSquareMouseDown = (clickedCell: ChessCell, ev: MouseEvent) => {
     ev.preventDefault() // Prevent default drag behavior
 
     // Start drag immediately if clicking on a piece
-    if (clickedCell.piece) {
+    if (
+      clickedCell.piece &&
+      (clickedCell.piece.color === 'white') === (moveHistory.length % 2 === 0)
+    ) {
       drag.active = true
       drag.dx = ev.clientX
       drag.dy = ev.clientY
@@ -35,14 +40,20 @@
         return
       }
       if (clickedCell.dotted) {
-        // If the clicked cell is dotted, the move is valid - add to move history
-        moveHistory = [
-          ...moveHistory,
-          {
-            from: { ...selectedPiece },
-            to: { ...clickedCell },
+        // If the clicked cell is dotted, the move is valid - create a clean move object
+        const move: ChessMove = {
+          from: {
+            ...selectedPiece,
+            selected: false,
+            dotted: false,
           },
-        ]
+          to: {
+            ...clickedCell,
+            selected: false,
+            dotted: false,
+          },
+        }
+        onMove?.(move)
         selectedCell = null
       }
     }
@@ -69,14 +80,28 @@
           const draggedCell = displayBoard[drag.iy][drag.ix]
 
           if (targetCell.dotted) {
-            // Valid move - add to move history
-            moveHistory = [
-              ...moveHistory,
-              {
-                from: { ...draggedCell },
-                to: { ...targetCell },
+            // Valid move - create a clean move object
+            const move: ChessMove = {
+              from: {
+                id: draggedCell.id,
+                ix: draggedCell.ix,
+                iy: draggedCell.iy,
+                color: draggedCell.color,
+                piece: draggedCell.piece,
+                selected: false,
+                dotted: false,
               },
-            ]
+              to: {
+                id: targetCell.id,
+                ix: targetCell.ix,
+                iy: targetCell.iy,
+                color: targetCell.color,
+                piece: targetCell.piece,
+                selected: false,
+                dotted: false,
+              },
+            }
+            onMove?.(move)
           }
         }
       }
@@ -93,7 +118,6 @@
     return drag.active && cell.ix === drag.ix && cell.iy === drag.iy
   }
 
-  let moveHistory = $state<ChessMove[]>([])
   let selectedCell = $state<{ ix: number; iy: number } | null>(null)
   let drag: DragInfo = $state({ active: false, dx: 0, dy: 0, ix: 0, iy: 0 })
 
